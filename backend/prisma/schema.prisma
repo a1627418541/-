@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  nickname  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions  GameSession[]
+}
+
+model Character {
+  id          String @id @default(uuid())
+  key         String @unique // linxiaonuan, guxingchen, xiaxiaokui, shenqiuqiu, sutong
+  name        String
+  avatar      String
+  title       String // 简短标签，如"邻家治愈系"
+  age         Int
+  occupation  String
+  bio         String // 一句话简介
+  // 完整人设数据存储为 JSON，包含背景、语气、口头禅、雷点、表白门槛等
+  profileData String @default("{}") // JSON string
+}
+
+model GameSession {
+  id        String   @id @default(uuid())
+  userId    String
+  characterKey String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  endedAt   DateTime?
+  endingId  String?  // 触发的结局ID
+
+  user        User        @relation(fields: [userId], references: [id])
+  messages    ChatMessage[]
+  gameState   GameState?
+}
+
+model GameState {
+  id              String @id @default(uuid())
+  sessionId       String @unique
+  affection       Int    @default(0)   // 隐藏好感度，范围建议 -100 ~ 100
+  trust           Int    @default(0)   // 信任度
+  mood            String @default("neutral") // happy, sad, angry, neutral, excited
+  relationshipStage String @default("stranger") // stranger, acquaintance, friend, close, lover
+  lastInteractionAt DateTime @default(now())
+  // 触发过的事件记录
+  triggeredEvents String @default("[]") // JSON array of event ids
+  // 玩家关键选择记录
+  playerChoices   String @default("{}") // JSON object
+
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id          String   @id @default(uuid())
+  sessionId   String
+  role        String   // user, assistant, system, event
+  content     String
+  messageType String   @default("text") // text, image
+  imageUrl    String?  // 照片URL，当messageType为image时使用
+  createdAt   DateTime @default(now())
+  // 如果是事件消息，记录事件类型
+  eventType   String?  // normal, story_event, ending_trigger
+
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}

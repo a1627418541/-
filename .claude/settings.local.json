@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" node check-db.mjs)",
+      "Bash(npx kill-port *)",
+      "Bash(nohup npx *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "Bash(node -e ' *)",
+      "Bash(npx tsx -e ' *)",
+      "Bash(curl -s http://localhost:3001/api/characters)",
+      "Bash(sqlite3 prisma/prisma/dev.db \"SELECT key, avatar FROM Character;\")",
+      "Bash(DATABASE_URL=\"file:./prisma/prisma/dev.db\" npx tsx update-avatars.ts)",
+      "Bash(npx tsx *)",
+      "Bash(node \"build/src/bin/chrome-devtools-mcp.js\")",
+      "Bash(kill %1)",
+      "Bash(node \"D:/源码/作业/chrome-devtools-mcp/build/src/bin/chrome-devtools-mcp.js\")",
+      "Bash(npx prisma *)",
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" npx prisma db push)",
+      "Bash(node scripts/download-photos.mjs)",
+      "Bash(DATABASE_URL=\"file:./prisma/dev.db\" npx prisma generate)",
+      "Bash(node scripts/download-remaining.mjs)"
+    ],
+    "additionalDirectories": [
+      "D:\\源码\\作业\\backend\\node_modules\\.prisma\\client"
+    ]
+  },
+  "enableAllProjectMcpServers": true
+}

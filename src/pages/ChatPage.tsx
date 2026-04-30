@@ -1,0 +1,248 @@
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useGameStore } from '../stores/gameStore'
+import { useAuthStore } from '../stores/authStore'
+import { ArrowLeft, Send } from 'lucide-react'
+
+const stageLabels: Record<string, string> = {
+  stranger: '初识',
+  acquaintance: '相识',
+  friend: '朋友',
+  close: '亲密',
+  lover: '恋人',
+}
+
+function formatTime(dateStr: string) {
+  const date = new Date(dateStr)
+  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+}
+
+export default function ChatPage() {
+  const navigate = useNavigate()
+  const { token } = useAuthStore()
+  const {
+    currentSession,
+    messages,
+    gameState,
+    isLoading,
+    error,
+    loadSession,
+    sendMessage,
+  } = useGameStore()
+
+  const [input, setInput] = useState('')
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/login')
+      return
+    }
+  }, [token, navigate])
+
+  useEffect(() => {
+    if (!currentSession) {
+      navigate('/')
+      return
+    }
+
+    console.log('[ChatPage] loadSession for', currentSession.id, currentSession.characterKey)
+    loadSession(currentSession.id)
+    inputRef.current?.focus()
+  }, [currentSession?.id, navigate, loadSession])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const handleSend = async () => {
+    const content = input.trim()
+    console.log('[ChatPage] handleSend', { content, isLoading, sessionId: currentSession?.id })
+    if (!content || isLoading) return
+
+    setInput('')
+    await sendMessage(content)
+    inputRef.current?.focus()
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  if (!currentSession || !gameState) {
+    return (
+      <div className="h-screen flex flex-col items-center justify-center bg-gray-100 px-4 text-center">
+        <div className="text-gray-500 mb-3">加载中...</div>
+        {error && (
+          <div className="max-w-md text-sm text-red-700 bg-red-100 border border-red-200 rounded-xl p-4">
+            {error}
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const characterName = currentSession.characterKey === 'linxiaonuan' ? '林晓暖'
+    : currentSession.characterKey === 'guxingchen' ? '顾星辰'
+    : currentSession.characterKey === 'xiaxiaokui' ? '夏小葵'
+    : currentSession.characterKey === 'shenqiuqiu' ? '沈清秋'
+    : '苏瞳'
+
+  return (
+    <div className="h-screen flex flex-col bg-[#f5f5f5]"
+    >
+      {/* Header - 微信式顶部 */}
+      <div className="flex items-center px-4 py-3 bg-[#ededed] border-b border-gray-300"
+      >
+        <button
+          onClick={() => navigate('/')}
+          className="p-2 -ml-2 hover:bg-gray-200 rounded-full transition-colors"
+        >
+          <ArrowLeft className="w-5 h-5 text-gray-700" />
+        </button>
+
+        <div className="flex-1 text-center"
+        >
+          <h2 className="text-base font-medium text-gray-900"
+          >{characterName}</h2>
+          <p className="text-xs text-gray-500"
+          >{stageLabels[gameState.relationshipStage]}</p>
+        </div>
+
+        <div className="w-9" />
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
+      >
+        {error && (
+          <div className="mx-auto max-w-lg rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+        {messages.length === 0 && (
+          <div className="text-center py-12"
+          >
+            <div className="text-4xl mb-4"
+            >💬</div>
+            <p className="text-gray-400 text-sm"
+            >发送第一条消息，开始你们的对话</p>
+          </div>
+        )}
+
+        {messages.map((msg, index) => {
+          const isUser = msg.role === 'user'
+          const showTime = index === 0 ||
+            new Date(msg.createdAt).getTime() - new Date(messages[index - 1].createdAt).getTime() > 5 * 60 * 1000
+
+          return (
+            <div key={msg.id}>
+              {showTime && (
+                <div className="text-center my-4"
+                >
+                  <span className="text-xs text-gray-400 bg-gray-200/50 px-2 py-1 rounded"
+                  >{formatTime(msg.createdAt)}</span>
+                </div>
+              )}
+
+              <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} gap-2`}
+              >
+                {!isUser && (
+                  <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm shrink-0"
+                  >
+                    {characterName[0]}
+                  </div>
+                )}
+
+                {msg.messageType === 'image' && msg.imageUrl ? (
+                  <div className="max-w-[60%] overflow-hidden rounded-2xl shadow-sm">
+                    <img
+                      src={msg.imageUrl}
+                      alt={msg.content}
+                      className="max-w-full max-h-96 rounded-2xl cursor-pointer hover:opacity-95 transition-opacity"
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/avatars/placeholder.png'
+                      }}
+                    />
+                    <p className="text-xs text-gray-400 mt-1 px-1">{msg.content}</p>
+                  </div>
+                ) : (
+                  <div
+                    className={`max-w-[70%] px-4 py-2.5 text-sm leading-relaxed ${
+                      isUser
+                        ? 'bg-[#95ec69] text-gray-900 rounded-2xl rounded-tr-sm'
+                        : 'bg-white text-gray-900 rounded-2xl rounded-tl-sm shadow-sm'
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
+                )}
+
+                {isUser && (
+                  <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-sm shrink-0"
+                  >
+                    我
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
+
+        {isLoading && (
+          <div className="flex justify-start gap-2"
+          >
+            <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm shrink-0"
+            >
+              {characterName[0]}
+            </div>
+            <div className="px-4 py-2.5 bg-white rounded-2xl rounded-tl-sm shadow-sm"
+            >
+              <div className="flex gap-1"
+              >
+                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
+                  style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
+                  style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce"
+                  style={{ animationDelay: '300ms' }} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input Area */}
+      <div className="px-4 py-3 bg-[#f7f7f7] border-t border-gray-200"
+      >
+        <div className="flex items-center gap-2"
+        >
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="说点什么..."
+            autoFocus
+            className="flex-1 px-4 py-2.5 bg-white rounded-full text-sm border border-gray-200 focus:outline-none focus:border-rose-400"
+          />
+          <button
+            onClick={handleSend}
+            disabled={!input.trim() || isLoading}
+            className="p-2.5 bg-rose-500 text-white rounded-full hover:bg-rose-600 disabled:opacity-50 disabled:hover:bg-rose-500 transition-colors"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
