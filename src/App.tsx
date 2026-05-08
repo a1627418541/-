@@ -1,9 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useAuthStore } from './stores/authStore'
+import Layout from './components/Layout'
 import LoginPage from './pages/LoginPage'
-import CharacterSelectPage from './pages/CharacterSelectPage'
+import ExplorePage from './pages/ExplorePage'
 import ChatPage from './pages/ChatPage'
+import ProfilePage from './pages/ProfilePage'
+import AIArtPage from './pages/AIArtPage'
 
 function App() {
   const { init } = useAuthStore()
@@ -16,8 +19,12 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<CharacterSelectPage />} />
-        <Route path="/chat" element={<ChatPage />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<ExplorePage />} />
+          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/ai-art" element={<AIArtPage />} />
+        </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

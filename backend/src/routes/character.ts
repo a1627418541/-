@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
     key: c.key,
     name: c.name,
     avatar: c.avatar,
+    coverImage: c.photos?.[0]?.url || c.avatar,
     title: c.title,
     age: c.age,
     occupation: c.occupation,

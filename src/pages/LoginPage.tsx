@@ -30,61 +30,61 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-pink-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
+      <div className="w-full max-w-md p-8 bg-white/5 border border-white/10 rounded-2xl">
         <div className="flex justify-center mb-6">
           <div className="w-16 h-16 bg-rose-500 rounded-full flex items-center justify-center">
             <Heart className="w-8 h-8 text-white" />
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">
+        <h1 className="text-2xl font-bold text-center text-white mb-2">
           {isLogin ? '欢迎回来' : '开始旅程'}
         </h1>
-        <p className="text-center text-gray-500 mb-8">
+        <p className="text-center text-gray-400 mb-8">
           {isLogin ? '登录以继续你的故事' : '创建账号，遇见你的她'}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">昵称</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">昵称</label>
               <input
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="你想让她怎么称呼你？"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500/50 transition-colors"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">邮箱</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500/50 transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">密码</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">密码</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-500"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500/50 transition-colors"
             />
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+            <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">
               {error}
             </div>
           )}
@@ -101,7 +101,7 @@ export default function LoginPage() {
         <div className="mt-6 text-center">
           <button
             onClick={toggleMode}
-            className="text-rose-500 text-sm hover:underline"
+            className="text-rose-400 text-sm hover:text-rose-300 transition-colors"
           >
             {isLogin ? '还没有账号？去注册' : '已有账号？去登录'}
           </button>

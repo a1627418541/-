@@ -5,6 +5,7 @@ export interface Character {
   key: string
   name: string
   avatar: string
+  coverImage: string
   title: string
   age: number
   occupation: string
@@ -30,6 +31,7 @@ export interface Message {
 
 interface GameStoreState {
   characters: Character[]
+  sessions: any[]
   currentSession: any | null
   messages: Message[]
   gameState: GameState | null
@@ -37,6 +39,7 @@ interface GameStoreState {
   error: string | null
 
   fetchCharacters: () => Promise<void>
+  fetchSessions: () => Promise<void>
   createSession: (characterKey: string) => Promise<boolean>
   loadSession: (sessionId: string) => Promise<boolean>
   sendMessage: (content: string) => Promise<boolean>
@@ -45,6 +48,7 @@ interface GameStoreState {
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
   characters: [],
+  sessions: [],
   currentSession: null,
   messages: [],
   gameState: null,
@@ -59,6 +63,23 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       }
     } catch (err: any) {
       set({ error: err.message })
+    }
+  },
+
+  fetchSessions: async () => {
+    try {
+      const res = await api.getSessions()
+      if (res.success) {
+        set({ sessions: res.data })
+        // Set the most recent session as current if none is set
+        const { currentSession } = get()
+        if (!currentSession && res.data.length > 0) {
+          const latest = res.data[0]
+          set({ currentSession: latest })
+        }
+      }
+    } catch (err: any) {
+      console.error('[gameStore] fetchSessions error', err)
     }
   },
 
