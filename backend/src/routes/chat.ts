@@ -50,6 +50,7 @@ router.post('/send', authMiddleware, async (req: AuthRequest, res) => {
       mood: gameState.mood,
       relationshipStage: gameState.relationshipStage,
       triggeredEvents: JSON.parse(gameState.triggeredEvents),
+      playerChoices: JSON.parse(gameState.playerChoices) as Record<string, string>,
     }
 
     // Analyze message impact on game state
@@ -192,6 +193,7 @@ router.post('/stream', authMiddleware, async (req: AuthRequest, res) => {
       mood: gameState.mood,
       relationshipStage: gameState.relationshipStage,
       triggeredEvents: JSON.parse(gameState.triggeredEvents),
+      playerChoices: JSON.parse(gameState.playerChoices) as Record<string, string>,
     }
 
     const impact = analyzeMessageImpact(content, character, currentState)

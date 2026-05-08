@@ -11,8 +11,8 @@ export interface AuthRequest extends Request {
 }
 
 export function generateToken(userId: string, email: string): string {
-  return jwt.sign({ id: userId, email }, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn,
+  return jwt.sign({ id: userId, email }, config.jwtSecret as jwt.Secret, {
+    expiresIn: config.jwtExpiresIn as jwt.SignOptions['expiresIn'],
   })
 }
 
