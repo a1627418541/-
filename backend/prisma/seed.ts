@@ -6,7 +6,7 @@ const characters = [
   {
     key: 'linxiaonuan',
     name: '林晓暖',
-    avatar: '/avatars/linxiaonuan.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=linxiaonuan&backgroundColor=ffdfbf',
     title: '邻家治愈系',
     age: 24,
     occupation: '社区医院儿科护士',
@@ -23,7 +23,7 @@ const characters = [
   {
     key: 'guxingchen',
     name: '顾星辰',
-    avatar: '/avatars/guxingchen.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=guxingchen&backgroundColor=c0aede',
     title: '傲娇大小姐',
     age: 26,
     occupation: '家族企业项目经理',
@@ -40,7 +40,7 @@ const characters = [
   {
     key: 'xiaxiaokui',
     name: '夏小葵',
-    avatar: '/avatars/xiaxiaokui.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=xiaxiaokui&backgroundColor=b6e3f4',
     title: '元气运动系',
     age: 22,
     occupation: '体育大学大四生，兼职健身教练',
@@ -57,7 +57,7 @@ const characters = [
   {
     key: 'shenqiuqiu',
     name: '沈清秋',
-    avatar: '/avatars/shenqiuqiu.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=shenqiuqiu&backgroundColor=d1d4f9',
     title: '知性文艺系',
     age: 27,
     occupation: '独立书店店主兼冷门文学译者',
@@ -74,7 +74,7 @@ const characters = [
   {
     key: 'sutong',
     name: '苏瞳',
-    avatar: '/avatars/sutong.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=sutong&backgroundColor=ffd5dc',
     title: '神秘猫系',
     age: 29,
     occupation: '自由插画师',

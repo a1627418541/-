@@ -7,7 +7,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
   linxiaonuan: {
     key: 'linxiaonuan',
     name: '林晓暖',
-    avatar: '/avatars/linxiaonuan.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=linxiaonuan&backgroundColor=ffdfbf',
     title: '邻家治愈系',
     age: 24,
     occupation: '社区医院儿科护士',
@@ -30,7 +30,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     photos: [
       {
         id: 'warm_selfie',
-        url: '/photos/linxiaonuan/warm_selfie.png',
+        url: 'https://api.dicebear.com/9.x/lorelei/png?seed=linxiaonuan&backgroundColor=ffdfbf',
         description: '穿着白色毛衣的温柔自拍，背景是暖色调的房间',
         scene: '日常分享',
       },
@@ -58,7 +58,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
   guxingchen: {
     key: 'guxingchen',
     name: '顾星辰',
-    avatar: '/avatars/guxingchen.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=guxingchen&backgroundColor=c0aede',
     title: '傲娇大小姐',
     age: 26,
     occupation: '家族企业项目经理',
@@ -80,7 +80,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     photos: [
       {
         id: 'office_cool',
-        url: '/photos/guxingchen/office_cool.png',
+        url: 'https://api.dicebear.com/9.x/lorelei/png?seed=guxingchen&backgroundColor=c0aede',
         description: '穿着干练职业装在办公室的自拍，表情高冷',
         scene: '工作日常',
       },
@@ -108,7 +108,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
   xiaxiaokui: {
     key: 'xiaxiaokui',
     name: '夏小葵',
-    avatar: '/avatars/xiaxiaokui.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=xiaxiaokui&backgroundColor=b6e3f4',
     title: '元气运动系',
     age: 22,
     occupation: '体育大学大四生，兼职健身教练',
@@ -131,7 +131,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     photos: [
       {
         id: 'gym_selfie',
-        url: '/photos/xiaxiaokui/gym_selfie.png',
+        url: 'https://api.dicebear.com/9.x/lorelei/png?seed=xiaxiaokui&backgroundColor=b6e3f4',
         description: '健身房里的活力自拍，马尾辫，灿烂的笑容',
         scene: '运动日常',
       },
@@ -159,7 +159,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
   shenqiuqiu: {
     key: 'shenqiuqiu',
     name: '沈清秋',
-    avatar: '/avatars/shenqiuqiu.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=shenqiuqiu&backgroundColor=d1d4f9',
     title: '知性文艺系',
     age: 27,
     occupation: '独立书店店主兼冷门文学译者',
@@ -182,7 +182,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     photos: [
       {
         id: 'bookstore',
-        url: '/photos/shenqiuqiu/bookstore.png',
+        url: 'https://api.dicebear.com/9.x/lorelei/png?seed=shenqiuqiu&backgroundColor=d1d4f9',
         description: '在书架间安静站立的侧影，手里捧着一本书',
         scene: '书店日常',
       },
@@ -210,7 +210,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
   sutong: {
     key: 'sutong',
     name: '苏瞳',
-    avatar: '/avatars/sutong.png',
+    avatar: 'https://api.dicebear.com/9.x/lorelei/png?seed=sutong&backgroundColor=ffd5dc',
     title: '神秘猫系',
     age: 29,
     occupation: '自由插画师',
@@ -233,7 +233,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     photos: [
       {
         id: 'art_studio',
-        url: '/photos/sutong/art_studio.png',
+        url: 'https://api.dicebear.com/9.x/lorelei/png?seed=sutong&backgroundColor=ffd5dc',
         description: '画室里专注作画的侧影，颜料沾在指尖',
         scene: '创作日常',
       },

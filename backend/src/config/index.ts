@@ -1,9 +1,13 @@
 import dotenv from 'dotenv'
 import { resolve } from 'path'
+import { fileURLToPath } from 'url'
 
 // Load .env from project root (parent of backend/)
-dotenv.config({ path: resolve(process.cwd(), '..', '.env.local') })
-dotenv.config({ path: resolve(process.cwd(), '..', '.env') })
+// In production (Render/Railway), env vars are injected directly
+// In local dev, load from .env files
+const __dirname = fileURLToPath(new URL('.', import.meta.url))
+dotenv.config({ path: resolve(__dirname, '../../.env.local') })
+dotenv.config({ path: resolve(__dirname, '../../.env') })
 
 export const config = {
   port: parseInt(process.env.PORT || '3001'),
@@ -14,18 +18,17 @@ export const config = {
   databaseUrl: process.env.DATABASE_URL || 'file:./dev.db',
 
   // AI Configuration (Kimi / Doubao)
-  // Supports Cloudflare AI Gateway by setting AI_BASE_URL to your gateway endpoint
-  aiProvider: process.env.AI_PROVIDER || 'kimi', // 'kimi' | 'doubao'
+  aiProvider: process.env.AI_PROVIDER || 'kimi',
   aiApiKey: process.env.AI_API_KEY || '',
-  aiBaseUrl: process.env.AI_BASE_URL || '', // e.g. https://gateway.cloudflare.ai/...
+  aiBaseUrl: process.env.AI_BASE_URL || '',
   aiModel: process.env.AI_MODEL || 'moonshot-v1-128k',
   aiTemperature: parseFloat(process.env.AI_TEMPERATURE || '0.7'),
 
-  // Legacy Kimi configs (backward compat)
+  // Legacy Kimi configs
   kimiApiKey: process.env.KIMI_API_KEY || '',
   kimiBaseUrl: process.env.KIMI_API_BASE || 'https://api.moonshot.cn/v1',
   kimiModel: process.env.KIMI_MODEL || 'moonshot-v1-128k',
 
-  // Crisp (frontend injects this)
+  // Crisp
   crispWebsiteId: process.env.CRISP_WEBSITE_ID || '',
 } as const

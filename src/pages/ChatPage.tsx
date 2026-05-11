@@ -22,6 +22,7 @@ export default function ChatPage() {
   const { token } = useAuthStore()
   const {
     currentSession,
+    characters,
     messages,
     gameState,
     isLoading,
@@ -86,11 +87,14 @@ export default function ChatPage() {
     )
   }
 
-  const characterName = currentSession.characterKey === 'linxiaonuan' ? '林晓暖'
+  const currentCharacter = characters.find(c => c.key === currentSession.characterKey)
+  const characterName = currentCharacter?.name
+    || (currentSession.characterKey === 'linxiaonuan' ? '林晓暖'
     : currentSession.characterKey === 'guxingchen' ? '顾星辰'
     : currentSession.characterKey === 'xiaxiaokui' ? '夏小葵'
     : currentSession.characterKey === 'shenqiuqiu' ? '沈清秋'
-    : '苏瞳'
+    : '苏瞳')
+  const characterAvatar = currentCharacter?.avatar
 
   return (
     <div className="h-screen flex flex-col bg-[#f5f5f5]"
@@ -152,10 +156,22 @@ export default function ChatPage() {
               <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} gap-2`}
               >
                 {!isUser && (
-                  <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm shrink-0"
-                  >
-                    {characterName[0]}
-                  </div>
+                  characterAvatar ? (
+                    <img
+                      src={characterAvatar}
+                      alt={characterName}
+                      className="w-9 h-9 rounded-full object-cover shrink-0"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none'
+                        e.currentTarget.parentElement!.innerHTML = `<div class="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm">${characterName[0]}</div>`
+                      }}
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm shrink-0"
+                    >
+                      {characterName[0]}
+                    </div>
+                  )
                 )}
 
                 {msg.messageType === 'image' && msg.imageUrl ? (
@@ -197,10 +213,21 @@ export default function ChatPage() {
         {isLoading && (
           <div className="flex justify-start gap-2"
           >
-            <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm shrink-0"
-            >
-              {characterName[0]}
-            </div>
+            {characterAvatar ? (
+              <img
+                src={characterAvatar}
+                alt={characterName}
+                className="w-9 h-9 rounded-full object-cover shrink-0"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none'
+                }}
+              />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm shrink-0"
+              >
+                {characterName[0]}
+              </div>
+            )}
             <div className="px-4 py-2.5 bg-white rounded-2xl rounded-tl-sm shadow-sm"
             >
               <div className="flex gap-1"
