@@ -40,17 +40,17 @@ class ApiClient {
   }
 
   // Auth
-  async register(email: string, password: string, nickname?: string) {
+  async register(email: string, password: string, nickname?: string, turnstileToken?: string) {
     return this.request<{ success: boolean; data: { token: string; user: any } }>('/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password, nickname }),
+      body: JSON.stringify({ email, password, nickname, turnstileToken }),
     })
   }
 
-  async login(email: string, password: string) {
+  async login(email: string, password: string, turnstileToken?: string) {
     return this.request<{ success: boolean; data: { token: string; user: any } }>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, turnstileToken }),
     })
   }
 

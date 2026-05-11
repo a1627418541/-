@@ -31,4 +31,7 @@ export const config = {
 
   // Crisp
   crispWebsiteId: process.env.CRISP_WEBSITE_ID || '',
+
+  // Turnstile
+  turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY || '',
 } as const

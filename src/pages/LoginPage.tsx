@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { Heart } from 'lucide-react'
+import Turnstile from '../components/Turnstile'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -9,15 +10,20 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [nickname, setNickname] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState('')
   const { login, register, isLoading, error } = useAuthStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!turnstileToken) {
+      useAuthStore.setState({ error: '请先完成人机验证' })
+      return
+    }
     let success = false
     if (isLogin) {
-      success = await login(email, password)
+      success = await login(email, password, turnstileToken)
     } else {
-      success = await register(email, password, nickname)
+      success = await register(email, password, nickname, turnstileToken)
     }
     if (success) {
       navigate('/')
@@ -82,6 +88,8 @@ export default function LoginPage() {
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-rose-500/50 transition-colors"
             />
           </div>
+
+          <Turnstile onVerify={(token) => setTurnstileToken(token)} />
 
           {error && (
             <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">

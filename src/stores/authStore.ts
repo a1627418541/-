@@ -13,8 +13,8 @@ interface AuthState {
   isLoading: boolean
   error: string | null
 
-  login: (email: string, password: string) => Promise<boolean>
-  register: (email: string, password: string, nickname?: string) => Promise<boolean>
+  login: (email: string, password: string, turnstileToken?: string) => Promise<boolean>
+  register: (email: string, password: string, nickname?: string, turnstileToken?: string) => Promise<boolean>
   logout: () => void
   init: () => void
 }
@@ -34,10 +34,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  login: async (email, password) => {
+  login: async (email, password, turnstileToken) => {
     set({ isLoading: true, error: null })
     try {
-      const res = await api.login(email, password)
+      const res = await api.login(email, password, turnstileToken)
       if (res.success) {
         localStorage.setItem('token', res.data.token)
         api.setToken(res.data.token)
@@ -51,10 +51,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  register: async (email, password, nickname) => {
+  register: async (email, password, nickname, turnstileToken) => {
     set({ isLoading: true, error: null })
     try {
-      const res = await api.register(email, password, nickname)
+      const res = await api.register(email, password, nickname, turnstileToken)
       if (res.success) {
         localStorage.setItem('token', res.data.token)
         api.setToken(res.data.token)
