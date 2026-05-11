@@ -140,10 +140,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     try {
       const res = await api.sendMessage(session.id, content)
       const newMessages = res.data.messages || [res.data.message]
-      const currentMessages = get().messages
-      const messagesWithoutTemp = currentMessages.filter(m => !m.id.startsWith('temp-'))
+      // Keep temp user message and append AI response; loadSession will replace with real IDs on next reload
       set({
-        messages: [...messagesWithoutTemp, ...newMessages],
+        messages: [...get().messages, ...newMessages],
         gameState: res.data.gameState,
         isLoading: false,
       })
