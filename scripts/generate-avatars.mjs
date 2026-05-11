@@ -6,29 +6,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const characters = [
   {
-    key: 'linxiaonuan',
-    name: '林晓暖',
-    prompt: '3D anime realistic style portrait of a gentle healing girl, short black hair, warm smile, wearing white nurse uniform, soft warm lighting, cream background, high quality, detailed face, beautiful eyes, 8k, masterpiece'
-  },
-  {
-    key: 'guxingchen',
-    name: '顾星辰',
-    prompt: '3D anime realistic style portrait of a tsundere elegant young lady, refined makeup, wearing dark business suit, slightly chin up, confident cool expression, purple gradient background, high quality, detailed face, beautiful eyes, 8k, masterpiece'
-  },
-  {
     key: 'xiaxiaokui',
     name: '夏小葵',
-    prompt: '3D anime realistic style portrait of an energetic sporty girl, high ponytail, wearing colorful sportswear, bright cheerful smile, sunlight outdoor background, high quality, detailed face, beautiful eyes, 8k, masterpiece'
-  },
-  {
-    key: 'shenqiuqiu',
-    name: '沈清秋',
-    prompt: '3D anime realistic style portrait of an intellectual literary woman, wearing round glasses, long straight hair, holding a book, bookstore background with soft warm lighting, high quality, detailed face, beautiful eyes, 8k, masterpiece'
+    prompt: 'Japanese anime 3D realistic style portrait, young human girl, high ponytail, wearing sporty tracksuit, bright cheerful smile, outdoor sunlight background, detailed face, beautiful eyes, masterpiece, 8k, soft lighting'
   },
   {
     key: 'sutong',
     name: '苏瞳',
-    prompt: '3D anime realistic style portrait of a mysterious cat-like woman, lazy half-closed eyes, long black hair, wearing artistic dark clothes, artistic bokeh background, high quality, detailed face, beautiful eyes, 8k, masterpiece'
+    prompt: 'Japanese anime 3D realistic style portrait, mysterious elegant human woman, lazy half-closed eyes, long straight black hair, wearing dark artistic dress, night city bokeh background, detailed face, beautiful eyes, masterpiece, 8k, cinematic lighting, fully human, no animal ears'
   }
 ]
 
@@ -39,7 +24,7 @@ function getPollinationsUrl(prompt, seed) {
 
 async function downloadImage(url, filepath) {
   console.log(`Downloading from: ${url.substring(0, 120)}...`)
-  const res = await fetch(url, { timeout: 120000 })
+  const res = await fetch(url)
   if (!res.ok) {
     throw new Error(`Failed to download image: HTTP ${res.status}`)
   }
@@ -54,7 +39,7 @@ async function main() {
 
   for (const char of characters) {
     try {
-      const url = getPollinationsUrl(char.prompt, 42)
+      const url = getPollinationsUrl(char.prompt, 88)
       const filepath = path.join(outputDir, `${char.key}.png`)
       console.log(`\n[${char.name}] Generating avatar...`)
       await downloadImage(url, filepath)
@@ -62,7 +47,6 @@ async function main() {
       console.error(`[${char.name}] FAILED:`, err.message)
     }
 
-    // Delay between requests to avoid rate limiting
     await new Promise(r => setTimeout(r, 3000))
   }
 
