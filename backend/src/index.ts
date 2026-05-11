@@ -39,5 +39,8 @@ app.use((err: Error, req: express.Request, res: express.Response, _next: express
 app.listen(config.port, () => {
   console.log(`Server running on http://localhost:${config.port}`)
   console.log(`AI Provider: ${config.aiProvider}`)
-  console.log(`AI Base URL: ${config.aiBaseUrl || config.kimiBaseUrl}`)
+  console.log(`AI Base URL: ${config.aiBaseUrl || config.kimiBaseUrl || '(not set)'}`)
+  console.log(`AI Model: ${config.aiModel || config.kimiModel || '(not set)'}`)
+  console.log(`AI API Key: ${config.aiApiKey ? 'configured' : 'NOT CONFIGURED'}`)
+  console.log(`JWT Secret: ${config.jwtSecret === 'your-secret-key-change-in-production' ? 'WARNING - using default' : 'configured'}`)
 })

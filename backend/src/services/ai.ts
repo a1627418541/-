@@ -17,9 +17,17 @@ export class AIService {
     this.baseUrl = config.aiBaseUrl || config.kimiBaseUrl
     this.model = config.aiModel || config.kimiModel
     this.temperature = config.aiTemperature
+  }
 
+  private ensureConfig() {
     if (!this.apiKey) {
-      throw new Error('AI API Key not configured')
+      throw new Error('AI API Key not configured. Set AI_API_KEY or KIMI_API_KEY.')
+    }
+    if (!this.baseUrl) {
+      throw new Error('AI Base URL not configured. Set AI_BASE_URL or KIMI_API_BASE.')
+    }
+    if (!this.model) {
+      throw new Error('AI Model not configured. Set AI_MODEL or KIMI_MODEL.')
     }
   }
 
@@ -27,6 +35,7 @@ export class AIService {
     messages: ChatMessage[],
     systemPrompt?: string
   ): AsyncGenerator<string, void, unknown> {
+    this.ensureConfig()
     const allMessages: ChatMessage[] = systemPrompt
       ? [{ role: 'system', content: systemPrompt }, ...messages]
       : messages
@@ -86,6 +95,7 @@ export class AIService {
     messages: ChatMessage[],
     systemPrompt?: string
   ): Promise<string> {
+    this.ensureConfig()
     const allMessages: ChatMessage[] = systemPrompt
       ? [{ role: 'system', content: systemPrompt }, ...messages]
       : messages
