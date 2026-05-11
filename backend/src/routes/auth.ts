@@ -102,4 +102,18 @@ router.post('/login', async (req, res) => {
   }
 })
 
+router.post('/verify-turnstile', async (req, res) => {
+  try {
+    const { token } = req.body
+    const valid = await verifyTurnstile(token)
+    if (valid) {
+      res.json({ success: true })
+    } else {
+      res.status(400).json({ success: false, error: '验证失败' })
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, error: '验证请求失败' })
+  }
+})
+
 export default router

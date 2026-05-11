@@ -7,6 +7,7 @@ import ExplorePage from './pages/ExplorePage'
 import ChatPage from './pages/ChatPage'
 import ProfilePage from './pages/ProfilePage'
 import AIArtPage from './pages/AIArtPage'
+import TestTurnstilePage from './pages/TestTurnstilePage'
 
 function App() {
   const { init } = useAuthStore()
@@ -19,6 +20,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/test-turnstile" element={<TestTurnstilePage />} />
         <Route element={<Layout />}>
           <Route path="/" element={<ExplorePage />} />
           <Route path="/chat" element={<ChatPage />} />
