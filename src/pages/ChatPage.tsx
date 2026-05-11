@@ -167,7 +167,7 @@ export default function ChatPage() {
                       }}
                     />
                   ) : (
-                    <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm shrink-0"
+                    <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm text-gray-900 shrink-0"
                     >
                       {characterName[0]}
                     </div>
@@ -200,7 +200,7 @@ export default function ChatPage() {
                 )}
 
                 {isUser && (
-                  <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-sm shrink-0"
+                  <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-sm text-gray-900 shrink-0"
                   >
                     我
                   </div>
@@ -223,7 +223,7 @@ export default function ChatPage() {
                 }}
               />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm shrink-0"
+              <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm text-gray-900 shrink-0"
               >
                 {characterName[0]}
               </div>
@@ -259,7 +259,7 @@ export default function ChatPage() {
             onKeyDown={handleKeyDown}
             placeholder="说点什么..."
             autoFocus
-            className="flex-1 px-4 py-2.5 bg-white rounded-full text-sm border border-gray-200 focus:outline-none focus:border-rose-400"
+            className="flex-1 px-4 py-2.5 bg-white rounded-full text-sm text-gray-900 border border-gray-200 focus:outline-none focus:border-rose-400"
           />
           <button
             onClick={handleSend}
