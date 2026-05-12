@@ -34,4 +34,8 @@ export const config = {
 
   // Turnstile
   turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY || '',
+
+  // Image Generation (Qwen-Wanxiang)
+  dashscopeApiKey: process.env.DASHSCOPE_API_KEY || '',
+  dashscopeImageModel: process.env.DASHSCOPE_IMAGE_MODEL || 'qwen-image-2.0-pro',
 } as const
