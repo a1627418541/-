@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.js'
 import characterRoutes from './routes/character.js'
 import gameRoutes from './routes/game.js'
 import chatRoutes from './routes/chat.js'
+import imageRoutes from './routes/image.js'
 
 const app = express()
 
@@ -29,6 +30,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/characters', characterRoutes)
 app.use('/api/game', gameRoutes)
 app.use('/api/chat', chatRoutes)
+app.use('/api/images', imageRoutes)
 
 // Error handler
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -42,5 +44,6 @@ app.listen(config.port, () => {
   console.log(`AI Base URL: ${config.aiBaseUrl || config.kimiBaseUrl || '(not set)'}`)
   console.log(`AI Model: ${config.aiModel || config.kimiModel || '(not set)'}`)
   console.log(`AI API Key: ${config.aiApiKey ? 'configured' : 'NOT CONFIGURED'}`)
+  console.log(`Image Gen: ${config.dashscopeApiKey ? 'configured (' + config.dashscopeImageModel + ')' : 'NOT CONFIGURED'}`)
   console.log(`JWT Secret: ${config.jwtSecret === 'your-secret-key-change-in-production' ? 'WARNING - using default' : 'configured'}`)
 })
