@@ -48,4 +48,6 @@ export interface CharacterProfile {
   loveThreshold: 'low' | 'medium' | 'high' | 'extreme'
   loveConfession: string
   photos: CharacterPhoto[]
+  /** 角色外貌描述，用于AI生图时保持人物形象一致性 */
+  avatarDescription: string
 }

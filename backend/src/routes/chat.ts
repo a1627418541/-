@@ -1,9 +1,13 @@
 import { Router } from 'express'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { prisma } from '../utils/prisma.js'
 import { authMiddleware, type AuthRequest } from '../middleware/auth.js'
 import { aiService } from '../services/ai.js'
 import { getCharacter, buildSystemPrompt } from '../services/character.js'
 import { calculateRelationshipStage, analyzeMessageImpact, checkEventTriggers } from '../services/game.js'
+import { imageGenerationService } from '../services/imageGeneration.js'
 
 const router = Router()
 
@@ -14,6 +18,50 @@ function parsePhotoTag(response: string): { text: string; photoId: string | null
   const photoId = match[1].trim()
   const text = response.replace(/\[SEND_PHOTO:[^\]]+\]\s*/, '').trim()
   return { text, photoId }
+}
+
+// Parse [GENERATE_PHOTO:description] from AI response and return { text, description }
+function parseGeneratePhotoTag(response: string): { text: string; description: string | null } {
+  const match = response.match(/\[GENERATE_PHOTO:([^\]]+)\]/)
+  if (!match) return { text: response, description: null }
+  const description = match[1].trim()
+  const text = response.replace(/\[GENERATE_PHOTO:[^\]]+\]\s*/, '').trim()
+  return { text, description }
+}
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const generatedPhotosDir = path.resolve(__dirname, '../../public/photos/generated')
+
+// Ensure generated photos directory exists
+fs.mkdirSync(generatedPhotosDir, { recursive: true })
+
+async function generateAndSavePhoto(
+  description: string,
+  characterName: string,
+  avatarDescription: string
+): Promise<string | null> {
+  try {
+    // 严格以角色头像形象为基准，确保人物一致性
+    const enhancedPrompt =
+      `3D写实风格，高质量，杰作，8k，${description}。` +
+      `画面中的人物必须是：${characterName}，${avatarDescription}。` +
+      `严格保持人物形象与头像完全一致，不要改变发型、五官、服装风格。`
+
+    const imageUrl = await imageGenerationService.generateImage(enhancedPrompt, {
+      size: '1024*1024',
+      watermark: false,
+    })
+
+    // Download and save locally (URL expires in 24h)
+    const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.png`
+    const filepath = path.join(generatedPhotosDir, filename)
+    await imageGenerationService.downloadImage(imageUrl, filepath)
+
+    return `/photos/generated/${filename}`
+  } catch (err) {
+    console.error('[Generate Photo] Failed:', err)
+    return null
+  }
 }
 
 router.post('/send', authMiddleware, async (req: AuthRequest, res) => {
@@ -84,8 +132,9 @@ router.post('/send', authMiddleware, async (req: AuthRequest, res) => {
     const aiMessages = [...recentMessages, { role: 'user' as const, content }]
     const aiResponse = await aiService.chatCompletion(aiMessages, systemPrompt)
 
-    // Parse photo tag from AI response
-    const { text: textContent, photoId } = parsePhotoTag(aiResponse)
+    // Parse photo tags from AI response
+    const { text: textAfterSendPhoto, photoId } = parsePhotoTag(aiResponse)
+    const { text: textContent, description: generateDescription } = parseGeneratePhotoTag(textAfterSendPhoto)
     const messages: any[] = []
 
     // Save text message (always)
@@ -99,7 +148,7 @@ router.post('/send', authMiddleware, async (req: AuthRequest, res) => {
     })
     messages.push(textMessage)
 
-    // Save photo message if photo tag present
+    // Handle SEND_PHOTO (existing photo)
     if (photoId) {
       const photo = character.photos.find(p => p.id === photoId)
       if (photo) {
@@ -110,6 +159,23 @@ router.post('/send', authMiddleware, async (req: AuthRequest, res) => {
             content: photo.description,
             messageType: 'image',
             imageUrl: photo.url,
+          },
+        })
+        messages.push(photoMessage)
+      }
+    }
+
+    // Handle GENERATE_PHOTO (AI generated photo)
+    if (generateDescription) {
+      const generatedUrl = await generateAndSavePhoto(generateDescription, character.name, character.avatarDescription)
+      if (generatedUrl) {
+        const photoMessage = await prisma.chatMessage.create({
+          data: {
+            sessionId,
+            role: 'assistant',
+            content: generateDescription,
+            messageType: 'image',
+            imageUrl: generatedUrl,
           },
         })
         messages.push(photoMessage)
@@ -233,7 +299,8 @@ router.post('/stream', authMiddleware, async (req: AuthRequest, res) => {
       res.write(`data: ${JSON.stringify({ chunk }) }\n\n`)
     }
 
-    const { text: textContent, photoId } = parsePhotoTag(fullResponse)
+    const { text: textAfterSendPhoto, photoId } = parsePhotoTag(fullResponse)
+    const { text: textContent, description: generateDescription } = parseGeneratePhotoTag(textAfterSendPhoto)
     const messages: any[] = []
 
     const assistantMessage = await prisma.chatMessage.create({
@@ -256,6 +323,22 @@ router.post('/stream', authMiddleware, async (req: AuthRequest, res) => {
             content: photo.description,
             messageType: 'image',
             imageUrl: photo.url,
+          },
+        })
+        messages.push(photoMessage)
+      }
+    }
+
+    if (generateDescription) {
+      const generatedUrl = await generateAndSavePhoto(generateDescription, character.name, character.avatarDescription)
+      if (generatedUrl) {
+        const photoMessage = await prisma.chatMessage.create({
+          data: {
+            sessionId,
+            role: 'assistant',
+            content: generateDescription,
+            messageType: 'image',
+            imageUrl: generatedUrl,
           },
         })
         messages.push(photoMessage)

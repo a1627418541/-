@@ -27,6 +27,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     ],
     loveThreshold: 'medium',
     loveConfession: `……我爱你。不是因为你需要我，是因为我需要你。`,
+    avatarDescription: '短发，齐刘海，温柔圆润的脸型，大眼睛，常穿白色或暖色系毛衣/护士服，整体气质温暖治愈',
     photos: [
       {
         id: 'warm_selfie',
@@ -77,6 +78,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     ],
     loveThreshold: 'high',
     loveConfession: `……我爱你。满意了吧？不许笑！`,
+    avatarDescription: '黑色中长发，精致瓜子脸，妆容干练，常穿灰色/深色职业套装或时尚正装，气质高冷傲娇',
     photos: [
       {
         id: 'office_cool',
@@ -128,6 +130,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     ],
     loveThreshold: 'medium',
     loveConfession: `……喂，我爱你啊。别愣着，给个回应！`,
+    avatarDescription: '高马尾辫，圆脸，阳光健康的肤色，常穿运动服/运动背心，气质活力元气',
     photos: [
       {
         id: 'gym_selfie',
@@ -179,6 +182,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     ],
     loveThreshold: 'high',
     loveConfession: `……我以前觉得『爱』是修辞。但现在，它是陈述句。`,
+    avatarDescription: '黑色长发，戴眼镜，知性文雅的脸型，常穿浅色高领毛衣或文艺风格服装，气质安静知性',
     photos: [
       {
         id: 'bookstore',
@@ -230,6 +234,7 @@ export const CHARACTERS: Record<string, CharacterProfile> = {
     ],
     loveThreshold: 'extreme',
     loveConfession: `……我爱你。`,
+    avatarDescription: '黑色长直发，慵懒狭长的眼睛，精致立体的五官，常穿黑色系/深色艺术感服装，气质神秘慵懒',
     photos: [
       {
         id: 'art_studio',
@@ -335,21 +340,27 @@ ${stageDescriptions[stage] || stageDescriptions.stranger}
 ${character.upsetTriggers.map(t => `- ${t}`).join('\n')}
 
 【发送照片功能】
-你手机里有一些照片。在合适的时候（比如玩家索要照片、你想分享生活、或者想表达心意时），你可以发送照片。
-你拥有的照片：
-${photosInfo}
+你拥有两类照片：
 
-发送照片的格式（非常重要，必须严格遵循）：
-当你想发送照片时，在消息末尾单独一行写下：
-[SEND_PHOTO:照片ID]
+1. 已有照片（上面列表中的）：
+发送格式：[SEND_PHOTO:照片ID]
 例如：[SEND_PHOTO:warm_selfie]
 
-规则：
-- 只有当你确实想发送照片时才使用这个格式
-- 照片ID必须从上面列表中选择
+2. AI 实时生成场景照片（仅限玩家明确要求时）：
+发送格式：[GENERATE_PHOTO:场景描述]
+例如：[GENERATE_PHOTO:在窗边看书的侧影，柔和午后阳光]
+
+你的固定形象（所有照片中必须保持一致）：
+${character.name}是一个${character.title}形象的中国年轻女性。${character.avatarDescription || '请参考你的头像照片保持一致的外貌特征。'}
+
+规则（极其重要，必须严格遵守）：
+- 严禁自主生图：只有玩家明确说"发张照片""给我看看""拍张照"等要求时，才能发送照片
+- 玩家没有要求时，绝对不要主动发送任何照片，即使你觉得照片很适合当前话题
+- 已有照片优先：如果玩家要求的照片在已有列表中有匹配的，使用 [SEND_PHOTO:照片ID]
+- 生成新照片时：使用 [GENERATE_PHOTO:场景描述]，描述中只需写场景和动作，人物形象会自动保持一致
+- 已有照片ID必须从列表中选择，不要编造不存在的ID
 - 发送照片前要有一段自然的文字过渡，不要突兀
 - 傲娇角色发送照片时会更扭捏，治愈系会更自然
-- 陌生阶段很少主动发照片，恋人阶段会频繁分享
 
 现在，以${character.name}的身份回复玩家的消息。`
 }
