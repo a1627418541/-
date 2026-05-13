@@ -8,6 +8,7 @@ import { aiService } from '../services/ai.js'
 import { getCharacter, buildSystemPrompt } from '../services/character.js'
 import { calculateRelationshipStage, analyzeMessageImpact, checkEventTriggers } from '../services/game.js'
 import { imageGenerationService } from '../services/imageGeneration.js'
+import { r2Service } from '../services/r2.js'
 
 const router = Router()
 
@@ -29,10 +30,9 @@ function parseGeneratePhotoTag(response: string): { text: string; description: s
   return { text, description }
 }
 
+// Local fallback storage (used when R2 is not configured)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const generatedPhotosDir = path.resolve(__dirname, '../../public/photos/generated')
-
-// Ensure generated photos directory exists
 fs.mkdirSync(generatedPhotosDir, { recursive: true })
 
 async function generateAndSavePhoto(
@@ -52,11 +52,25 @@ async function generateAndSavePhoto(
       watermark: false,
     })
 
-    // Download and save locally (URL expires in 24h)
-    const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.png`
-    const filepath = path.join(generatedPhotosDir, filename)
-    await imageGenerationService.downloadImage(imageUrl, filepath)
+    // Download image buffer
+    const res = await fetch(imageUrl)
+    if (!res.ok) throw new Error(`Failed to download image: HTTP ${res.status}`)
+    const buffer = Buffer.from(await res.arrayBuffer())
 
+    const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.png`
+
+    // Try R2 first, fallback to local filesystem
+    if (r2Service.isConfigured()) {
+      const key = `generated/${filename}`
+      const publicUrl = await r2Service.uploadImage(key, buffer)
+      console.log('[Generate Photo] Uploaded to R2:', publicUrl)
+      return publicUrl
+    }
+
+    // Fallback: save locally
+    const filepath = path.join(generatedPhotosDir, filename)
+    fs.writeFileSync(filepath, buffer)
+    console.log('[Generate Photo] Saved locally:', filepath)
     return `/photos/generated/${filename}`
   } catch (err) {
     console.error('[Generate Photo] Failed:', err)

@@ -8,6 +8,7 @@ import ChatPage from './pages/ChatPage'
 import ProfilePage from './pages/ProfilePage'
 import AIArtPage from './pages/AIArtPage'
 import TestTurnstilePage from './pages/TestTurnstilePage'
+import CrispChat from './components/CrispChat'
 
 function App() {
   const { init } = useAuthStore()
@@ -18,6 +19,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <CrispChat />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/test-turnstile" element={<TestTurnstilePage />} />

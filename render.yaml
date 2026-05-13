@@ -26,3 +26,13 @@ services:
         sync: false  # 在 Render Dashboard 手动设置（千问万相生图API密钥）
       - key: DASHSCOPE_IMAGE_MODEL
         value: qwen-image-2.0-pro
+      - key: R2_ENDPOINT
+        sync: false  # 在 Render Dashboard 手动设置
+      - key: R2_ACCESS_KEY_ID
+        sync: false  # 在 Render Dashboard 手动设置
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false  # 在 Render Dashboard 手动设置
+      - key: R2_BUCKET_NAME
+        sync: false  # 在 Render Dashboard 手动设置
+      - key: R2_PUBLIC_URL
+        sync: false  # 在 Render Dashboard 手动设置

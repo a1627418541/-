@@ -38,4 +38,11 @@ export const config = {
   // Image Generation (Qwen-Wanxiang)
   dashscopeApiKey: process.env.DASHSCOPE_API_KEY || '',
   dashscopeImageModel: process.env.DASHSCOPE_IMAGE_MODEL || 'qwen-image-2.0-pro',
+
+  // Cloudflare R2 (Object Storage for generated images)
+  r2Endpoint: process.env.R2_ENDPOINT || '',
+  r2AccessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+  r2SecretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',
+  r2BucketName: process.env.R2_BUCKET_NAME || '',
+  r2PublicUrl: process.env.R2_PUBLIC_URL || '',
 } as const
