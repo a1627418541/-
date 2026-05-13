@@ -28,7 +28,7 @@ export default function ChatPage() {
     isLoading,
     error,
     loadSession,
-    sendMessage,
+    sendMessageStream,
   } = useGameStore()
 
   const [input, setInput] = useState('')
@@ -63,7 +63,7 @@ export default function ChatPage() {
     if (!content || isLoading) return
 
     setInput('')
-    await sendMessage(content)
+    await sendMessageStream(content)
     inputRef.current?.focus()
   }
 

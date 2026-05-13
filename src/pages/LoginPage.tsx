@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 import { Heart } from 'lucide-react'
 import Turnstile from '../components/Turnstile'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [isLogin, setIsLogin] = useState(true)
+  const from = (location.state as any)?.from || '/'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [nickname, setNickname] = useState('')
@@ -26,7 +28,7 @@ export default function LoginPage() {
       success = await register(email, password, nickname, turnstileToken)
     }
     if (success) {
-      navigate('/')
+      navigate(from, { replace: true })
     }
   }
 

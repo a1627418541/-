@@ -153,28 +153,44 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }
   },
 
-  sendMessageStream: async (content: string, onUpdate) => {
+  sendMessageStream: async (content: string) => {
     const session = get().currentSession
     if (!session) return
 
-    const tempMessage: Message = {
-      id: `temp-${Date.now()}`,
+    const tempUserId = `temp-user-${Date.now()}`
+    const tempAiId = `temp-ai-${Date.now()}`
+
+    const tempUserMessage: Message = {
+      id: tempUserId,
       role: 'user',
       content,
       createdAt: new Date().toISOString(),
     }
 
-    set({ messages: [...get().messages, tempMessage], isLoading: true })
+    const tempAiMessage: Message = {
+      id: tempAiId,
+      role: 'assistant',
+      content: '',
+      createdAt: new Date().toISOString(),
+    }
 
-    let fullResponse = ''
+    set({
+      messages: [...get().messages, tempUserMessage, tempAiMessage],
+      isLoading: true,
+    })
 
     try {
       await api.streamMessage(session.id, content, (chunk) => {
-        fullResponse += chunk
-        onUpdate(fullResponse)
+        const currentMessages = get().messages
+        const aiIndex = currentMessages.findIndex(m => m.id === tempAiId)
+        if (aiIndex >= 0) {
+          const updated = [...currentMessages]
+          updated[aiIndex] = { ...updated[aiIndex], content: chunk }
+          set({ messages: updated })
+        }
       })
 
-      // After stream completes, reload session to get persisted message
+      // After stream completes, reload session to get persisted message (including photos)
       const res = await api.getSession(session.id)
       if (res.success) {
         set({

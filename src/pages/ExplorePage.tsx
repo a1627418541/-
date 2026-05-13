@@ -29,15 +29,17 @@ export default function ExplorePage() {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!token) {
-      navigate('/login')
-      return
-    }
     fetchCharacters()
-    fetchSessions()
-  }, [token, navigate, fetchCharacters, fetchSessions])
+    if (token) {
+      fetchSessions()
+    }
+  }, [token, fetchCharacters, fetchSessions])
 
   const handleSelect = async (key: string) => {
+    if (!token) {
+      navigate('/login', { state: { from: '/' } })
+      return
+    }
     const success = await createSession(key)
     if (success) {
       navigate('/chat')
@@ -83,6 +85,22 @@ export default function ExplorePage() {
 
           {/* Spacer */}
           <div className="flex-1" />
+
+          {token ? (
+            <button
+              onClick={() => useAuthStore.getState().logout()}
+              className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
+            >
+              退出登录
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/login')}
+              className="px-4 py-2 bg-rose-500 text-white text-sm rounded-xl hover:bg-rose-600 transition-colors"
+            >
+              登录 / 注册
+            </button>
+          )}
 
           {/* Creator toggle placeholder */}
           <div className="flex items-center gap-2 text-sm text-gray-400">

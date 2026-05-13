@@ -14,6 +14,7 @@ import characterRoutes from './routes/character.js'
 import gameRoutes from './routes/game.js'
 import chatRoutes from './routes/chat.js'
 import imageRoutes from './routes/image.js'
+import { startCronJobs } from './services/cronJobs.js'
 
 const app = express()
 
@@ -47,4 +48,7 @@ app.listen(config.port, () => {
   console.log(`Image Gen: ${config.dashscopeApiKey ? 'configured (' + config.dashscopeImageModel + ')' : 'NOT CONFIGURED'}`)
   console.log(`R2 Storage: ${config.r2Endpoint ? 'configured (' + config.r2BucketName + ')' : 'NOT CONFIGURED (using local filesystem)'}`)
   console.log(`JWT Secret: ${config.jwtSecret === 'your-secret-key-change-in-production' ? 'WARNING - using default' : 'configured'}`)
+
+  // Start scheduled cron jobs
+  startCronJobs()
 })
