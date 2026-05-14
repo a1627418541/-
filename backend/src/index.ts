@@ -14,6 +14,7 @@ import characterRoutes from './routes/character.js'
 import gameRoutes from './routes/game.js'
 import chatRoutes from './routes/chat.js'
 import imageRoutes from './routes/image.js'
+import cronRoutes from './routes/cron.js'
 import { startCronJobs } from './services/cronJobs.js'
 
 const app = express()
@@ -32,6 +33,7 @@ app.use('/api/characters', characterRoutes)
 app.use('/api/game', gameRoutes)
 app.use('/api/chat', chatRoutes)
 app.use('/api/images', imageRoutes)
+app.use('/api/cron', cronRoutes)
 
 // Error handler
 app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {

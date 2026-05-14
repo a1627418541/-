@@ -43,7 +43,7 @@ interface GameStoreState {
   createSession: (characterKey: string) => Promise<boolean>
   loadSession: (sessionId: string) => Promise<boolean>
   sendMessage: (content: string) => Promise<boolean>
-  sendMessageStream: (content: string, onUpdate: (text: string) => void) => Promise<void>
+  sendMessageStream: (content: string) => Promise<void>
 }
 
 export const useGameStore = create<GameStoreState>((set, get) => ({

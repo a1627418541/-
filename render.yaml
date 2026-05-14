@@ -36,3 +36,7 @@ services:
         sync: false  # 在 Render Dashboard 手动设置
       - key: R2_PUBLIC_URL
         sync: false  # 在 Render Dashboard 手动设置
+      - key: RESEND_API_KEY
+        sync: false  # 在 Render Dashboard 手动设置
+      - key: CRON_SECRET
+        sync: false  # 在 Render Dashboard 手动设置（外部 cron 服务调用时的密钥）
