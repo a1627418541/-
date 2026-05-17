@@ -17,6 +17,10 @@ interface TurnstileProps {
 export default function Turnstile({ onVerify }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const onVerifyRef = useRef(onVerify);
+
+  // Keep callback ref up to date without triggering re-render
+  onVerifyRef.current = onVerify;
 
   useEffect(() => {
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY;
@@ -36,7 +40,7 @@ export default function Turnstile({ onVerify }: TurnstileProps) {
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: siteKey,
         theme: "dark",
-        callback: (token: string) => onVerify(token),
+        callback: (token: string) => onVerifyRef.current(token),
       });
     };
 
@@ -57,7 +61,8 @@ export default function Turnstile({ onVerify }: TurnstileProps) {
         widgetIdRef.current = null;
       }
     };
-  }, [onVerify]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return <div ref={containerRef} className="flex justify-center" />;
 }
