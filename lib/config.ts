@@ -1,7 +1,4 @@
 export const config = {
-  jwtSecret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
-  jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
-
   databaseUrl: process.env.DATABASE_URL || '',
 
   aiProvider: process.env.AI_PROVIDER || 'kimi',
@@ -30,4 +27,9 @@ export const config = {
 
   resendApiKey: process.env.RESEND_API_KEY || '',
   cronSecret: process.env.CRON_SECRET || '',
+
+  betterAuthSecret: process.env.BETTER_AUTH_SECRET || '',
+  betterAuthUrl: process.env.BETTER_AUTH_URL || '',
+  googleClientId: process.env.GOOGLE_CLIENT_ID || '',
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
 } as const

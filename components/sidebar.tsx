@@ -55,7 +55,7 @@ export default function Sidebar() {
           </div>
         )}
         <button
-          onClick={logout}
+          onClick={async () => { await logout() }}
           className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-gray-400 hover:text-gray-200 hover:bg-white/5 transition-colors"
         >
           <LogOut className="w-5 h-5 shrink-0" />

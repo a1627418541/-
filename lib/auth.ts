@@ -1,41 +1,35 @@
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcryptjs'
-import { NextRequest } from 'next/server'
-import { config } from './config'
+import { betterAuth } from "better-auth";
+import { Pool } from "@neondatabase/serverless";
+import { NextRequest } from "next/server";
+
+export const auth = betterAuth({
+  database: new Pool({
+    connectionString: process.env.DATABASE_URL,
+  }),
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL,
+  emailAndPassword: {
+    enabled: true,
+    autoSignIn: true,
+    minPasswordLength: 6,
+  },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+  },
+});
 
 export interface AuthUser {
-  id: string
-  email: string
-}
-
-export function generateToken(userId: string, email: string): string {
-  return jwt.sign({ id: userId, email }, config.jwtSecret, {
-    expiresIn: config.jwtExpiresIn as jwt.SignOptions['expiresIn'],
-  })
-}
-
-export function verifyToken(token: string): AuthUser | null {
-  try {
-    return jwt.verify(token, config.jwtSecret) as AuthUser
-  } catch {
-    return null
-  }
-}
-
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 10)
-}
-
-export async function comparePassword(password: string, hashed: string): Promise<boolean> {
-  return bcrypt.compare(password, hashed)
+  id: string;
+  email: string;
 }
 
 export async function getAuthUser(request: NextRequest): Promise<AuthUser | null> {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader?.startsWith('Bearer ')) {
-    return null
-  }
-
-  const token = authHeader.slice(7)
-  return verifyToken(token)
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+  if (!session) return null;
+  return { id: session.user.id, email: session.user.email };
 }

@@ -24,7 +24,7 @@ const tagColors: Record<string, string> = {
 
 export default function ExplorePage() {
   const router = useRouter()
-  const { token } = useAuthStore()
+  const { user } = useAuthStore()
   const { characters, currentSession, gameState, sessions, fetchCharacters, createSession, fetchSessions } = useGameStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTag, setActiveTag] = useState('all')
@@ -32,13 +32,13 @@ export default function ExplorePage() {
 
   useEffect(() => {
     fetchCharacters()
-    if (token) {
+    if (user) {
       fetchSessions()
     }
-  }, [token, fetchCharacters, fetchSessions])
+  }, [user, fetchCharacters, fetchSessions])
 
   const handleSelect = async (key: string) => {
-    if (!token) {
+    if (!user) {
       router.push('/login?from=/')
       return
     }
@@ -88,9 +88,9 @@ export default function ExplorePage() {
           {/* Spacer */}
           <div className="flex-1" />
 
-          {token ? (
+          {user ? (
             <button
-              onClick={() => useAuthStore.getState().logout()}
+              onClick={async () => { await useAuthStore.getState().logout() }}
               className="px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
             >
               退出登录

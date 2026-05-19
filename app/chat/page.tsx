@@ -21,7 +21,7 @@ function formatTime(dateStr: string) {
 
 export default function ChatPage() {
   const router = useRouter()
-  const { token } = useAuthStore()
+  const { user } = useAuthStore()
   const {
     currentSession,
     characters,
@@ -46,14 +46,14 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (!isReady) return
-    if (!token) {
+    if (!user) {
       router.push('/login')
       return
     }
-  }, [isReady, token, router])
+  }, [isReady, user, router])
 
   useEffect(() => {
-    if (!isReady || !token) return
+    if (!isReady || !user) return
     if (!currentSession) {
       // 尝试从后端恢复会话（覆盖 rehydrate 延迟的情况）
       useGameStore.getState().fetchSessions().then(() => {
@@ -67,7 +67,7 @@ export default function ChatPage() {
     console.log('[ChatPage] loadSession for', currentSession.id, currentSession.characterKey)
     loadSession(currentSession.id)
     inputRef.current?.focus()
-  }, [isReady, token, currentSession?.id, router, loadSession])
+  }, [isReady, user, currentSession?.id, router, loadSession])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

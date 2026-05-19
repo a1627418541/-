@@ -17,7 +17,7 @@ export default function ProfilePage() {
               <User className="w-10 h-10 text-rose-400" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold">{user?.nickname || '用户'}</h2>
+              <h2 className="text-xl font-semibold">{user?.name || '用户'}</h2>
               <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
                 <Mail className="w-4 h-4" />
                 <span>{user?.email || '未登录'}</span>
@@ -38,7 +38,7 @@ export default function ProfilePage() {
         </div>
 
         <button
-          onClick={logout}
+          onClick={async () => { await logout() }}
           className="flex items-center gap-2 w-full px-4 py-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl hover:bg-red-500/20 transition-colors"
         >
           <LogOut className="w-5 h-5" />
