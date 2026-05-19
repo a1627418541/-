@@ -1,5 +1,7 @@
 {
+  "framework": "nextjs",
   "outputDirectory": ".next",
+  "buildCommand": "prisma generate && npm run build",
   "crons": [
     {
       "path": "/api/cron/daily-love-letter",
