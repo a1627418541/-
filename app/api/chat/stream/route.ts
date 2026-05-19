@@ -25,9 +25,6 @@ function parseGeneratePhotoTag(response: string): { text: string; description: s
   return { text, description }
 }
 
-const generatedPhotosDir = path.resolve(process.cwd(), 'public/photos/generated')
-fs.mkdirSync(generatedPhotosDir, { recursive: true })
-
 async function generateAndSavePhoto(
   description: string,
   characterName: string,
@@ -57,10 +54,16 @@ async function generateAndSavePhoto(
       return publicUrl
     }
 
-    const filepath = path.join(generatedPhotosDir, filename)
-    fs.writeFileSync(filepath, buffer)
-    console.log('[Generate Photo] Saved locally:', filepath)
-    return `/photos/generated/${filename}`
+    try {
+      const generatedPhotosDir = path.resolve(process.cwd(), 'public/photos/generated')
+      fs.mkdirSync(generatedPhotosDir, { recursive: true })
+      const filepath = path.join(generatedPhotosDir, filename)
+      fs.writeFileSync(filepath, buffer)
+      console.log('[Generate Photo] Saved locally:', filepath)
+      return `/photos/generated/${filename}`
+    } catch {
+      return null
+    }
   } catch (err) {
     console.error('[Generate Photo] Failed:', err)
     return null
