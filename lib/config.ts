@@ -20,7 +20,7 @@ export const config = {
   turnstileSiteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
 
   dashscopeApiKey: process.env.DASHSCOPE_API_KEY || '',
-  dashscopeImageModel: process.env.DASHSCOPE_IMAGE_MODEL || 'qwen-image-2.0-pro',
+  dashscopeImageModel: process.env.DASHSCOPE_IMAGE_MODEL || 'wanx2.1-t2i-turbo',
 
   r2Endpoint: process.env.R2_ENDPOINT || '',
   r2AccessKeyId: process.env.R2_ACCESS_KEY_ID || '',

@@ -1,39 +1,42 @@
 import { config } from '@/lib/config'
 
-interface QwenImageResponse {
+interface TaskSubmitResponse {
   output?: {
-    choices?: Array<{
-      finish_reason?: string
-      message?: {
-        role?: string
-        content?: Array<{
-          image?: string
-          text?: string
-        }>
-      }
-    }>
+    task_id?: string
+    task_status?: string
   }
-  usage?: {
-    height?: number
-    width?: number
-    image_count?: number
+  request_id?: string
+}
+
+interface TaskResultResponse {
+  output?: {
+    task_id?: string
+    task_status?: string
+    results?: Array<{
+      url?: string
+      code?: string
+      message?: string
+    }>
+    task_metrics?: {
+      TOTAL_IMAGE?: number
+    }
   }
   request_id?: string
 }
 
 /**
- * Image Generation Service - Qwen-Wanxiang (千问万相)
- * Supports generating images from text prompts
+ * Image Generation Service - DashScope Wanxiang (通义万相)
+ * Uses async task API with polling
  */
 export class ImageGenerationService {
   private apiKey: string
   private model: string
-  private baseUrl: string
+  private submitUrl: string
 
   constructor() {
     this.apiKey = config.dashscopeApiKey
     this.model = config.dashscopeImageModel
-    this.baseUrl = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation'
+    this.submitUrl = 'https://dashscope.aliyuncs.com/api/v1/services/aigc/text2image/image-synthesis'
   }
 
   private ensureConfig() {
@@ -42,11 +45,84 @@ export class ImageGenerationService {
     }
   }
 
+  private async submitTask(
+    prompt: string,
+    parameters: Record<string, any>
+  ): Promise<string> {
+    const body = {
+      model: this.model,
+      input: { prompt },
+      parameters,
+    }
+
+    const response = await fetch(this.submitUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.apiKey}`,
+        'X-DashScope-Async': 'enable',
+      },
+      body: JSON.stringify(body),
+    })
+
+    if (!response.ok) {
+      const error = await response.text().catch(() => 'Unknown error')
+      throw new Error(`Image generation submit error (${response.status}): ${error}`)
+    }
+
+    const data: TaskSubmitResponse = await response.json()
+    const taskId = data.output?.task_id
+
+    if (!taskId) {
+      console.error('Task submit response:', JSON.stringify(data, null, 2))
+      throw new Error('No task_id in submit response')
+    }
+
+    return taskId
+  }
+
+  private async pollTaskResult(taskId: string, maxWaitMs = 120000): Promise<string> {
+    const pollInterval = 2000
+    const startTime = Date.now()
+    const taskUrl = `https://dashscope.aliyuncs.com/api/v1/tasks/${taskId}`
+
+    while (Date.now() - startTime < maxWaitMs) {
+      const response = await fetch(taskUrl, {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+        },
+      })
+
+      if (!response.ok) {
+        const error = await response.text().catch(() => 'Unknown error')
+        throw new Error(`Task polling error (${response.status}): ${error}`)
+      }
+
+      const data: TaskResultResponse = await response.json()
+      const status = data.output?.task_status
+
+      if (status === 'SUCCEEDED') {
+        const url = data.output?.results?.[0]?.url
+        if (url) return url
+        throw new Error('Task succeeded but no image URL found')
+      }
+
+      if (status === 'FAILED') {
+        const msg = data.output?.results?.[0]?.message || 'Unknown failure'
+        throw new Error(`Image generation failed: ${msg}`)
+      }
+
+      await new Promise(r => setTimeout(r, pollInterval))
+    }
+
+    throw new Error('Image generation timed out')
+  }
+
   /**
    * Generate an image from a text prompt
    * @param prompt - Text description of the desired image
    * @param options - Optional generation parameters
-   * @returns URL of the generated image (valid for 24 hours)
+   * @returns URL of the generated image
    */
   async generateImage(
     prompt: string,
@@ -70,53 +146,23 @@ export class ImageGenerationService {
       seed,
     } = options
 
-    const body: Record<string, any> = {
-      model: this.model,
-      input: {
-        messages: [
-          {
-            role: 'user',
-            content: [{ text: prompt }],
-          },
-        ],
-      },
-      parameters: {
-        size,
-        watermark,
-        prompt_extend: promptExtend,
-        n,
-      },
+    const parameters: Record<string, any> = {
+      size,
+      watermark,
+      prompt_extend: promptExtend,
+      n,
     }
 
     if (negativePrompt) {
-      body.parameters.negative_prompt = negativePrompt
+      parameters.negative_prompt = negativePrompt
     }
 
     if (seed !== undefined) {
-      body.parameters.seed = seed
+      parameters.seed = seed
     }
 
-    const response = await fetch(this.baseUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      const error = await response.text().catch(() => 'Unknown error')
-      throw new Error(`Image generation API error (${response.status}): ${error}`)
-    }
-
-    const data: QwenImageResponse = await response.json()
-    const imageUrl = data.output?.choices?.[0]?.message?.content?.[0]?.image
-
-    if (!imageUrl) {
-      console.error('Image generation response:', JSON.stringify(data, null, 2))
-      throw new Error('No image URL in response')
-    }
+    const taskId = await this.submitTask(prompt, parameters)
+    const imageUrl = await this.pollTaskResult(taskId)
 
     return imageUrl
   }
