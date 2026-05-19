@@ -100,6 +100,12 @@ export default function LoginForm() {
 
           <Turnstile onVerify={(token) => setTurnstileToken(token)} />
 
+          {turnstileToken === '__disabled__' && (
+            <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm rounded-lg">
+              人机验证服务暂不可用，已自动跳过（仅影响当前网络环境）
+            </div>
+          )}
+
           {error && (
             <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">
               {error}

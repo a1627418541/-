@@ -32,14 +32,17 @@ export default function Turnstile({ onVerify }: TurnstileProps) {
       return
     }
 
-    // 5秒超时兜底：如果Turnstile一直没响应，自动跳过
+    // 2秒超时兜底：如果Turnstile一直没响应，自动跳过
     const timeoutId = setTimeout(() => {
       if (!completedRef.current) {
         console.warn('[Turnstile] Timeout, skipping verification')
-        completedRef.current = true
-        onVerifyRef.current('__disabled__')
+        if (widgetIdRef.current && window.turnstile) {
+          window.turnstile.remove(widgetIdRef.current)
+          widgetIdRef.current = null
+        }
+        handleComplete('__disabled__')
       }
-    }, 5000)
+    }, 2000)
 
     const existingScript = document.querySelector(
       'script[src="https://challenges.cloudflare.com/turnstile/v0/api.js"]'
@@ -63,6 +66,10 @@ export default function Turnstile({ onVerify }: TurnstileProps) {
         callback: (token: string) => handleComplete(token),
         'error-callback': () => {
           console.warn('[Turnstile] Widget error, skipping verification')
+          if (widgetIdRef.current && window.turnstile) {
+            window.turnstile.remove(widgetIdRef.current)
+            widgetIdRef.current = null
+          }
           handleComplete('__disabled__')
         },
         'expired-callback': () => {
