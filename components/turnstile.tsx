@@ -26,7 +26,8 @@ export default function Turnstile({ onVerify }: TurnstileProps) {
   useEffect(() => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
     if (!siteKey) {
-      console.warn('[Turnstile] NEXT_PUBLIC_TURNSTILE_SITE_KEY not set')
+      console.warn('[Turnstile] NEXT_PUBLIC_TURNSTILE_SITE_KEY not set, skipping')
+      onVerifyRef.current('__disabled__')
       return
     }
 
