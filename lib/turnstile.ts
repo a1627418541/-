@@ -1,8 +1,12 @@
 import { config } from './config'
 
 export async function verifyTurnstile(token: string): Promise<boolean> {
-  if (!config.turnstileSecretKey) {
-    console.warn('[Turnstile] TURNSTILE_SECRET_KEY not configured, skipping verification')
+  if (!config.turnstileSecretKey || token === '__disabled__') {
+    if (token === '__disabled__') {
+      console.warn('[Turnstile] Client failed to load, skipping verification')
+    } else {
+      console.warn('[Turnstile] TURNSTILE_SECRET_KEY not configured, skipping verification')
+    }
     return true
   }
   try {
