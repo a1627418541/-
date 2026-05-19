@@ -43,6 +43,13 @@ export default function Turnstile({ onVerify }: TurnstileProps) {
         sitekey: siteKey,
         theme: 'dark',
         callback: (token: string) => onVerifyRef.current(token),
+        'error-callback': () => {
+          console.warn('[Turnstile] Widget failed to load, skipping verification')
+          onVerifyRef.current('__disabled__')
+        },
+        'expired-callback': () => {
+          window.turnstile?.reset(widgetIdRef.current!)
+        },
       })
     }
 
