@@ -8,6 +8,10 @@ export const auth = betterAuth({
   }),
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins: [
+    "https://lianlianlianlianlian.vercel.app",
+    "https://lianlianlianlianlian-9npgl6aar-a1627418541s-projects.vercel.app",
+  ],
   emailAndPassword: {
     enabled: true,
     autoSignIn: true,
