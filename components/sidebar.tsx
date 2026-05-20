@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Compass, Image, User, MessageCircle, LogOut, Heart } from 'lucide-react'
+import { Compass, Image, User, MessageCircle, LogOut, Heart, Crown } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
 const navItems = [
   { path: '/', icon: Compass, label: '探索' },
   { path: '/ai-art', icon: Image, label: 'AI艺术' },
+  { path: '/pricing', icon: Crown, label: '会员' },
   { path: '/profile', icon: User, label: '个人资料' },
   { path: '/chat', icon: MessageCircle, label: '对话' },
 ]
