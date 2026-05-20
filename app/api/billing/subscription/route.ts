@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 export async function GET(request: NextRequest) {
   const user = await getAuthUser(request);
@@ -30,7 +30,7 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "无有效订阅" }, { status: 400 });
   }
 
-  await stripe.subscriptions.update(subscription.stripeSubscriptionId, {
+  await getStripe().subscriptions.update(subscription.stripeSubscriptionId, {
     cancel_at_period_end: true,
   });
 

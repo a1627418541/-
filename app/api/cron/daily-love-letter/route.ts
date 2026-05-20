@@ -18,13 +18,21 @@ export async function GET(request: NextRequest) {
     const sessions = await prisma.gameSession.findMany({
       where: {
         endedAt: null,
-        user: { email: { not: '' } },
       },
       include: {
-        user: true,
         gameState: true,
       },
     })
+
+    const userIds = [...new Set(sessions.map((s) => s.userId))]
+    const users = await prisma.user.findMany({
+      where: {
+        id: { in: userIds },
+        email: { not: '' },
+      },
+    })
+
+    const userMap = new Map(users.map((u) => [u.id, u]))
 
     let sentCount = 0
     let failCount = 0
@@ -38,6 +46,12 @@ export async function GET(request: NextRequest) {
     }
 
     for (const session of sessions) {
+      const user = userMap.get(session.userId)
+      if (!user) {
+        failCount++
+        continue
+      }
+
       try {
         const letter = await generateDailyLoveLetter(
           session.characterKey,
@@ -46,18 +60,18 @@ export async function GET(request: NextRequest) {
         )
 
         await sendLoveLetterEmail({
-          to: session.user.email,
-          nickname: session.user.nickname,
+          to: user.email,
+          nickname: user.name || '用户',
           characterName: characterNames[session.characterKey] || '你的她',
           subject: letter.subject,
           content: letter.content,
         })
 
         sentCount++
-        console.log(`[Cron] Love letter sent to ${session.user.email} (${session.characterKey})`)
+        console.log(`[Cron] Love letter sent to ${user.email} (${session.characterKey})`)
       } catch (err) {
         failCount++
-        console.error(`[Cron] Failed to send love letter to ${session.user.email}:`, err)
+        console.error(`[Cron] Failed to send love letter to ${user.email}:`, err)
       }
     }
 

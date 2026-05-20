@@ -7,16 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String        @id @default(uuid())
-  email     String        @unique
-  password  String
-  nickname  String?
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  sessions  GameSession[]
-}
-
 model Character {
   id          String @id @default(uuid())
   key         String @unique
@@ -38,7 +28,6 @@ model GameSession {
   endedAt      DateTime?
   endingId     String?
   messages     ChatMessage[]
-  user         User          @relation(fields: [userId], references: [id])
   gameState    GameState?
 }
 
