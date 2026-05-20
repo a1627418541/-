@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
       },
     ],
     mode: "subscription",
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/profile?success=true`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/pricing?canceled=true`,
+    success_url: `${request.nextUrl.origin}/profile?success=true`,
+    cancel_url: `${request.nextUrl.origin}/pricing?canceled=true`,
     metadata: {
       userId: user.id,
       plan,

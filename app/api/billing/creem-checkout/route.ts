@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       customer: {
         email: user.email,
       },
-      successUrl: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/profile?success=true`,
+      successUrl: `${request.nextUrl.origin}/profile?success=true`,
       metadata: {
         userId: user.id,
         email: user.email,
