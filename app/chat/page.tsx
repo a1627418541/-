@@ -4,7 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useGameStore } from '@/stores/game-store'
 import { useAuthStore } from '@/stores/auth-store'
-import { ArrowLeft, Send } from 'lucide-react'
+import { ArrowLeft, Send, Smile } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import type { EmojiClickData } from 'emoji-picker-react'
 
 const stageLabels: Record<string, string> = {
   stranger: '初识',
@@ -35,8 +37,10 @@ export default function ChatPage() {
 
   const [input, setInput] = useState('')
   const [isReady, setIsReady] = useState(false)
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const emojiPickerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // 给 Zustand persist rehydrate 一点时间
@@ -72,6 +76,26 @@ export default function ChatPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // 点击外部关闭 emoji picker
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target as Node)) {
+        setShowEmojiPicker(false)
+      }
+    }
+    if (showEmojiPicker) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showEmojiPicker])
+
+  const EmojiPicker = dynamic(() => import('emoji-picker-react'), { ssr: false })
+
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    setInput((prev) => prev + emojiData.emoji)
+    inputRef.current?.focus()
+  }
 
   const handleSend = async () => {
     const content = input.trim()
@@ -225,8 +249,15 @@ export default function ChatPage() {
       </div>
 
       {/* Input Area */}
-      <div className="px-4 py-3 bg-[#f7f7f7] border-t border-gray-200">
+      <div className="px-4 py-3 bg-[#f7f7f7] border-t border-gray-200 relative">
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className="p-2.5 text-gray-500 hover:text-rose-500 hover:bg-gray-200 rounded-full transition-colors"
+            type="button"
+          >
+            <Smile className="w-5 h-5" />
+          </button>
           <input
             ref={inputRef}
             type="text"
@@ -245,6 +276,12 @@ export default function ChatPage() {
             <Send className="w-4 h-4" />
           </button>
         </div>
+
+        {showEmojiPicker && (
+          <div ref={emojiPickerRef} className="absolute bottom-full left-4 mb-2 z-50">
+            <EmojiPicker onEmojiClick={handleEmojiClick} />
+          </div>
+        )}
       </div>
     </div>
   )
