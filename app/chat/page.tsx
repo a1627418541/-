@@ -151,6 +151,9 @@ export default function ChatPage() {
 
         {messages.map((msg, index) => {
           const isUser = msg.role === 'user'
+          // 跳过空内容的 AI 临时占位消息
+          if (!isUser && !msg.content.trim() && msg.messageType !== 'image') return null
+
           const showTime = index === 0 ||
             new Date(msg.createdAt).getTime() - new Date(messages[index - 1].createdAt).getTime() > 5 * 60 * 1000
 
