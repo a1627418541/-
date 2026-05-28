@@ -220,32 +220,6 @@ export default function ChatPage() {
           )
         })}
 
-        {isLoading && (
-          <div className="flex justify-start gap-2">
-            {characterAvatar ? (
-              <img
-                src={characterAvatar}
-                alt={characterName}
-                className="w-9 h-9 rounded-full object-cover shrink-0"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none'
-                }}
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-sm text-gray-900 shrink-0">
-                {characterName[0]}
-              </div>
-            )}
-            <div className="px-4 py-2.5 bg-white rounded-2xl rounded-tl-sm shadow-sm">
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-gray-300 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-              </div>
-            </div>
-          </div>
-        )}
-
         <div ref={messagesEndRef} />
       </div>
 
