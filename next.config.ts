@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",
+              "frame-src 'self' https://challenges.cloudflare.com",
             ].join('; '),
           },
         ],
