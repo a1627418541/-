@@ -34,8 +34,9 @@ export async function POST(request: NextRequest) {
   const result: TurnstileVerifyResponse = await verifyResponse.json();
 
   if (!result.success) {
+    console.error("[Turnstile verify failed]", result["error-codes"], "hostname:", result.hostname);
     return NextResponse.json(
-      { error: "人机验证失败，请重试" },
+      { error: "人机验证失败，请重试", details: result["error-codes"] },
       { status: 400 }
     );
   }
