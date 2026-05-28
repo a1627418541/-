@@ -38,6 +38,10 @@ export default function LoginForm() {
     }
     if (success) {
       router.push(from)
+    } else {
+      // 登录/注册失败后重置 Turnstile（token 是一次性的）
+      setTurnstileToken('')
+      turnstileRef.current?.reset()
     }
   }
 
