@@ -125,7 +125,13 @@ export default function ChatPage() {
 
         <div className="flex-1 text-center">
           <h2 className="text-base font-medium text-gray-900">{characterName}</h2>
-          <p className="text-xs text-gray-500">{stageLabels[gameState.relationshipStage]}</p>
+          {isLoading ? (
+            <p className="text-xs text-gray-500 animate-pulse">
+              正在输入中<span className="inline-block w-4 text-left">...</span>
+            </p>
+          ) : (
+            <p className="text-xs text-gray-500">{stageLabels[gameState.relationshipStage]}</p>
+          )}
         </div>
 
         <div className="w-9" />
