@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const { sessionId, content } = await request.json()
+  const { sessionId, content, imageUrl, messageType } = await request.json()
 
   const session = await prisma.gameSession.findFirst({
     where: { id: sessionId, userId: user.id },
@@ -92,8 +92,17 @@ export async function POST(request: NextRequest) {
     return new Response('Character not found', { status: 404 })
   }
 
+  const finalMessageType = messageType || (imageUrl ? 'image' : 'text')
+  const finalContent = content || (imageUrl ? (finalMessageType === 'voice' ? '' : '[图片]') : '')
+
   await prisma.chatMessage.create({
-    data: { sessionId, role: 'user', content },
+    data: {
+      sessionId,
+      role: 'user',
+      content: finalContent,
+      messageType: finalMessageType,
+      imageUrl: imageUrl || undefined,
+    },
   })
 
   const gameState = session.gameState!

@@ -61,10 +61,30 @@ class ApiClient {
     });
   }
 
+  async uploadFile(file: File, type: 'image' | 'voice' = 'image') {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('type', type)
+
+    const response = await fetch(`${API_BASE}/api/upload`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData,
+    })
+
+    const data = await response.json()
+    if (!response.ok) {
+      throw new Error(data.error || `HTTP ${response.status}`)
+    }
+    return data as { success: boolean; url: string; type: string }
+  }
+
   async streamMessage(
     sessionId: string,
     content: string,
-    onChunk: (chunk: string) => void
+    onChunk: (chunk: string) => void,
+    imageUrl?: string,
+    messageType?: string
   ) {
     const response = await fetch(`${API_BASE}/api/chat/stream`, {
       method: "POST",
@@ -72,7 +92,7 @@ class ApiClient {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({ sessionId, content }),
+      body: JSON.stringify({ sessionId, content, imageUrl, messageType }),
     });
 
     const reader = response.body?.getReader();

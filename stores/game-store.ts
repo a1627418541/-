@@ -46,7 +46,9 @@ interface GameStoreState {
   createSession: (characterKey: string) => Promise<boolean>
   loadSession: (sessionId: string) => Promise<boolean>
   sendMessage: (content: string) => Promise<boolean>
-  sendMessageStream: (content: string) => Promise<void>
+  sendMessageStream: (content: string, imageUrl?: string) => Promise<void>
+  sendImage: (file: File) => Promise<boolean>
+  sendVoice: (blob: Blob, duration: number) => Promise<boolean>
 }
 
 export const useGameStore = create<GameStoreState>()(
@@ -156,7 +158,7 @@ export const useGameStore = create<GameStoreState>()(
         }
       },
 
-      sendMessageStream: async (content: string) => {
+      sendMessageStream: async (content: string, imageUrl?: string) => {
         const session = get().currentSession
         if (!session) return
 
@@ -166,8 +168,10 @@ export const useGameStore = create<GameStoreState>()(
         const tempUserMessage: Message = {
           id: tempUserId,
           role: 'user',
-          content,
+          content: content || (imageUrl ? '[图片]' : ''),
           createdAt: new Date().toISOString(),
+          messageType: imageUrl ? 'image' : 'text',
+          imageUrl: imageUrl || undefined,
         }
 
         const tempAiMessage: Message = {
@@ -191,7 +195,7 @@ export const useGameStore = create<GameStoreState>()(
               updated[aiIndex] = { ...updated[aiIndex], content: chunk }
               set({ messages: updated })
             }
-          })
+          }, imageUrl)
 
           const res = await api.getSession(session.id)
           if (res.success) {
@@ -204,6 +208,80 @@ export const useGameStore = create<GameStoreState>()(
           }
         } catch (err: any) {
           set({ error: err.message, isLoading: false })
+        }
+      },
+
+      sendImage: async (file: File) => {
+        const session = get().currentSession
+        if (!session) return false
+
+        set({ isLoading: true, error: null })
+        try {
+          const uploadRes = await api.uploadFile(file, 'image')
+          await get().sendMessageStream('', uploadRes.url)
+          return true
+        } catch (err: any) {
+          set({ error: err.message || '发送图片失败', isLoading: false })
+          return false
+        }
+      },
+
+      sendVoice: async (blob: Blob, duration: number) => {
+        const session = get().currentSession
+        if (!session) return false
+
+        set({ isLoading: true, error: null })
+        try {
+          const file = new File([blob], `voice-${Date.now()}.webm`, { type: blob.type || 'audio/webm' })
+          const uploadRes = await api.uploadFile(file, 'voice')
+
+          const tempUserId = `temp-user-${Date.now()}`
+          const tempAiId = `temp-ai-${Date.now()}`
+
+          const tempUserMessage: Message = {
+            id: tempUserId,
+            role: 'user',
+            content: `${duration}`,
+            createdAt: new Date().toISOString(),
+            messageType: 'voice',
+            imageUrl: uploadRes.url,
+          }
+
+          const tempAiMessage: Message = {
+            id: tempAiId,
+            role: 'assistant',
+            content: '',
+            createdAt: new Date().toISOString(),
+          }
+
+          set({
+            messages: [...get().messages, tempUserMessage, tempAiMessage],
+            isLoading: true,
+          })
+
+          await api.streamMessage(session.id, `${duration}`, (chunk) => {
+            const currentMessages = get().messages
+            const aiIndex = currentMessages.findIndex(m => m.id === tempAiId)
+            if (aiIndex >= 0) {
+              const updated = [...currentMessages]
+              updated[aiIndex] = { ...updated[aiIndex], content: chunk }
+              set({ messages: updated })
+            }
+          }, uploadRes.url, 'voice')
+
+          const res = await api.getSession(session.id)
+          if (res.success) {
+            set({
+              currentSession: res.data,
+              messages: res.data.messages || [],
+              gameState: res.data.gameState,
+              isLoading: false,
+            })
+          }
+          return true
+        } catch (err: any) {
+          set({ error: err.message || '发送语音失败', isLoading: false })
+          return false
         }
       },
     }),
