@@ -121,10 +121,19 @@ export async function POST(request: NextRequest) {
   const newMood = impact.moodChange || gameState.mood
   const newStage = calculateRelationshipStage(newAffection)
 
-  const recentMessages = session.messages.slice(-20).map(m => ({
-    role: m.role as 'user' | 'assistant' | 'system',
-    content: m.content,
-  }))
+  const recentMessages = session.messages.slice(-20).map(m => {
+    let content = m.content
+    if (m.messageType === 'voice' && m.imageUrl) {
+      const seconds = parseInt(m.content) || 0
+      content = seconds > 0 ? `[发送了一段${seconds}秒的语音消息]` : '[发送了一条语音消息]'
+    } else if (m.messageType === 'image' && m.imageUrl) {
+      content = m.content || '[发送了一张图片]'
+    }
+    return {
+      role: m.role as 'user' | 'assistant' | 'system',
+      content,
+    }
+  })
 
   const systemPrompt = buildSystemPrompt(character, {
     affection: newAffection,

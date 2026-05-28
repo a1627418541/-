@@ -5,7 +5,7 @@ export const config = {
   aiApiKey: process.env.AI_API_KEY || '',
   aiBaseUrl: process.env.AI_BASE_URL || '',
   aiModel: process.env.AI_MODEL || 'moonshot-v1-128k',
-  aiTemperature: parseFloat(process.env.AI_TEMPERATURE || '0.7'),
+  aiTemperature: parseFloat(process.env.AI_TEMPERATURE || '0.92'),
 
   kimiApiKey: process.env.KIMI_API_KEY || '',
   kimiBaseUrl: process.env.KIMI_API_BASE || 'https://api.moonshot.cn/v1',
