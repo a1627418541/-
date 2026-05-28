@@ -13,8 +13,8 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
 
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (email: string, password: string, name?: string) => Promise<boolean>;
+  login: (email: string, password: string, turnstileToken?: string) => Promise<boolean>;
+  register: (email: string, password: string, name?: string, turnstileToken?: string) => Promise<boolean>;
   logout: () => Promise<void>;
   init: () => Promise<void>;
   setUser: (user: User | null) => void;
@@ -39,8 +39,22 @@ export const useAuthStore = create<AuthState>()((set) => ({
     }
   },
 
-  login: async (email, password) => {
+  login: async (email, password, turnstileToken) => {
     set({ isLoading: true, error: null });
+
+    if (turnstileToken) {
+      const verifyRes = await fetch("/api/verify-turnstile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: turnstileToken }),
+      });
+      if (!verifyRes.ok) {
+        const verifyData = await verifyRes.json().catch(() => ({}));
+        set({ error: verifyData.error || "人机验证失败", isLoading: false });
+        return false;
+      }
+    }
+
     const { data, error } = await authClient.signIn.email({
       email,
       password,
@@ -64,8 +78,22 @@ export const useAuthStore = create<AuthState>()((set) => ({
     return true;
   },
 
-  register: async (email, password, name) => {
+  register: async (email, password, name, turnstileToken) => {
     set({ isLoading: true, error: null });
+
+    if (turnstileToken) {
+      const verifyRes = await fetch("/api/verify-turnstile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: turnstileToken }),
+      });
+      if (!verifyRes.ok) {
+        const verifyData = await verifyRes.json().catch(() => ({}));
+        set({ error: verifyData.error || "人机验证失败", isLoading: false });
+        return false;
+      }
+    }
+
     const { data, error } = await authClient.signUp.email({
       email,
       password,

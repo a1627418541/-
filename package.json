@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1045.0",
+    "@marsidev/react-turnstile": "^1.5.2",
     "@neondatabase/serverless": "^1.1.0",
     "@prisma/client": "^6.0.0",
     "@tailwindcss/postcss": "^4.2.4",

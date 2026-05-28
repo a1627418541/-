@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthStore } from '@/stores/auth-store'
 import { authClient } from '@/lib/auth-client'
 import { Heart } from 'lucide-react'
+import { Turnstile } from '@marsidev/react-turnstile'
 
 export default function LoginForm() {
   const router = useRouter()
@@ -15,15 +16,25 @@ export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const [turnstileError, setTurnstileError] = useState('')
+  const turnstileRef = useRef<any>(null)
   const { login, register, isLoading, error } = useAuthStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setTurnstileError('')
+
+    if (!turnstileToken) {
+      setTurnstileError('请先完成人机验证')
+      return
+    }
+
     let success = false
     if (isLogin) {
-      success = await login(email, password)
+      success = await login(email, password, turnstileToken)
     } else {
-      success = await register(email, password, name)
+      success = await register(email, password, name, turnstileToken)
     }
     if (success) {
       router.push(from)
@@ -39,7 +50,10 @@ export default function LoginForm() {
 
   const toggleMode = () => {
     setIsLogin(!isLogin)
+    setTurnstileToken('')
+    setTurnstileError('')
     useAuthStore.setState({ error: null })
+    turnstileRef.current?.reset()
   }
 
   return (
@@ -96,15 +110,37 @@ export default function LoginForm() {
             />
           </div>
 
-          {error && (
+          <div className="flex justify-center">
+            <Turnstile
+              ref={turnstileRef}
+              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ''}
+              onSuccess={(token) => {
+                setTurnstileToken(token)
+                setTurnstileError('')
+              }}
+              onError={() => {
+                setTurnstileToken('')
+                setTurnstileError('人机验证加载失败，请刷新页面重试')
+              }}
+              onExpire={() => {
+                setTurnstileToken('')
+              }}
+              options={{
+                theme: 'dark',
+                size: 'normal',
+              }}
+            />
+          </div>
+
+          {(error || turnstileError) && (
             <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">
-              {error}
+              {turnstileError || error}
             </div>
           )}
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || !turnstileToken}
             className="w-full py-3 bg-rose-500 text-white rounded-xl font-medium hover:bg-rose-600 disabled:opacity-50 transition-colors"
           >
             {isLoading ? '处理中...' : isLogin ? '登录' : '注册'}
